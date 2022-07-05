@@ -45,7 +45,7 @@ The array of strings isn’t very easy to work with. What we’re interested in 
 function buildGraph(edges) {
   let graph = Object.create(null);
   function addEdge(from, to) {
-    if (graph[from] == null) {
+        if (graph[from] == null) {
       graph[from] = [to];
     } else {
       graph[from].push(to);
