@@ -1,14 +1,12 @@
-// Goal is to create a delivery robot that picks up and drops off parcels and 
-// to write the code starting with the most obtuse information possible.
-// The robot exists in a virtual village initially represented by the roads between
-// each point.
-
 // I copied the reading into the readme, and I'm coding along with the readme and 
 // adding comments to break down the code. Some times I rename parameters to be
 // more specific.
 
+// Goal is to create a delivery robot that picks up and drops off parcels, and to
+// write the code using with the most obtuse starting information possible.
+
 // We start with an array of roads that represents the village where the robot
-//  will do it's thing. Although one would expect to also have a list of parcels
+// will do it's thing. Although one would expect to also have a list of parcels,
 // and the addresses those parcels need to go to, this exercise doesn't provide one. 
 
 // It begins with roads...
@@ -26,15 +24,12 @@ const roads = [
 // Each element in the array seems to have two parts:
 // a "start point" and an "end point" with a "-" character in between
 
-// I guessed what the map could look like and added a .png of the drawing. It has 14
-// roads and our array has 14 elements, so it should be ok.
-
 // How can we use this information to give instructions to a robot? Continuing the reading, 
 // we need to take the array of strings and create a data structure that tells us
 // what each location is, and what locations it is connected to
 
-// If it looks like I can rewrite a function as an arrow funciton, I'm doing it,
-// so some of these may differ slightly than the readme.
+// Where applicable, I rewrote funcitons declarations as arrow functions, so the readme
+// won't match perfectly.
 
 // We want a function that will take in our roads array as an argument. 
 // the purpose of the function is to use that array to create something like this:
@@ -47,32 +42,31 @@ const roads = [
 const buildGraph = (edges) => {
     // first, we create an object that has no default properties with Object.create(null)
     let graph = Object.create(null)
-    // we create an addEdge function that will take start, end as arguments and
+    // we create an addEdge function that will take start, end as arguments
     const addEdge = (start, end) => {
-        // A) add a key to our graph called [start] with property [end] or
+        // it will either add a key to our graph called [start] with property [end],
         if (graph[start] == null) {
             graph[start] = [end]
-        // B) add a property [end] to an existing [start]. 
+        // or add a property [end] to an existing [start]. 
         } else {
             graph[start].push(end)
         }
     }
-    // next we need loop that will iterate over over every element in our passed array.
+    // next we need loop that will iterate over over the array that gets passed in.
     // The loop will do two things:
-    // 1) take our array elemnents and convert them from strings into [start, end] arrays, and
+    // 1) take our array elemnents and convert them from strings into [start, end] arrays
     for (let [start, end] of edges.map((element) => element.split('-'))) {
-        // 2) invoke addEdge using start, end as arguments
+        // 2) and invoke addEdge using start, end as arguments
         addEdge(start, end)
-        // addEdge runs with the start and end pieces swapped, since addEdge(start, end),
-        // adds Bob's House as a property of Alice's house but not the other way around.
-        // Alice's house is added as a destination of Bob's House when we run addEdge(end, start). 
         addEdge(end, start)
+        // addEdge runs with the start and end pieces swapped, since addEdge(start, end)
+        // adds Bob's House as a property of Alice's house, but not the other way around.
     }
 
     // I'll break things down below.
     // The first element in the array will go from "Alice's House-Bob's House" to 
     // ["Alice's House", "Bob's House"] via the .split method.
-    // The use of the one line function makes that look clean but hard to interpret (to me). 
+    // The use of the one line function makes that look clean, but hard to interpret (to me). 
     // Here is what the code would look like as 5 lines instead of 4
 
     // edges.map((element) => {
@@ -81,17 +75,14 @@ const buildGraph = (edges) => {
     //     addEdge(end, start)
     // })
     
-    // Personally? I find that one line functions are spooky. It's much easier to 
-    // understand that we're iterating over the array with .map, then splitting
-    // each element with .split, then doing the addEdge stuff.
-    // Condensing the .map method and .split method onto one line hurts my small brain
+    // // // // I like the second option a lot better, but w/e // // // //
 
     // don't forget to return.
     return graph
 }
 
 // We're done with writing that function.
-// Next we create a variable that is the value of buildGraph(roads)
+// Next we create a variable that invokes buildGraph(roads)
 
 const roadGraph = buildGraph(roads)
 
@@ -103,7 +94,7 @@ console.log(roadGraph)
 // Cabin: ["Alice's House"]
 // ETC
 
-// I attempted to break the code down with an example, since it's some new to me
+// I attempted to break the code down with an example, since it's still new to me
 
 // simplified example:
 const exampleRoads = ["Alice's House-Bob's House", "Alice's House-Cabin",]
@@ -111,10 +102,10 @@ const exampleRoads = ["Alice's House-Bob's House", "Alice's House-Cabin",]
 const addExampleEdge = (start, end, obj) => {
     if (obj[start] == null) {
         obj[start] = [end]
-        console.log(`adding value ${end} to obj[${ start }]`)
+        // console.log(`adding value ${end} to obj[${ start }]`)
     } else {
         obj[start].push(end)
-        console.log(`pushing ${end} into obj[${start}]`)
+        // console.log(`pushing ${end} into obj[${start}]`)
     }
 }
 
@@ -128,7 +119,7 @@ const buildExampleGraph = (edges) => {
     return graph
 }
 
-console.log(buildExampleGraph(exampleRoads))
+// console.log(buildExampleGraph(exampleRoads))
 
 
 // I abstracted the addEdge function and took it out of the buildGraph function.
@@ -139,7 +130,7 @@ console.log(buildExampleGraph(exampleRoads))
 // exampleRoadsArray moves through the buildExampleGraph function. I added
 // some console log messages to show exactly what occurs. 
 
-// (example below is just a reminder for me to better about object properties)
+// (example below is just a reminder for me to rember declaring object properties)
 
 // let emptyObj = {}
 // console.log(emptyObj) //=>{}
@@ -182,7 +173,7 @@ console.log(buildExampleGraph(exampleRoads))
 // programmers, that should be a special object known as a class. We'll declare the class first,
 // and then talk about its properties.
 
-// If that is confusing, chapter 6, the MDN resources on class and constructor will help.
+// If that is confusing, chapter 6, and the MDN resources on class and constructor will help.
 
 
 class VillageState {
