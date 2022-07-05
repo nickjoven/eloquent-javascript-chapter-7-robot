@@ -191,11 +191,12 @@ VillageState.random = function(parcelCount = 5) {
   return new VillageState("Post Office", parcels);
 };
 ```
-```
+
 
 We don’t want any parcels that are sent from the same place that they are addressed to. For this reason, the do loop keeps picking new places when it gets one that’s equal to the address.
 
 Let’s start up a virtual world.
+
 ```javascript
 runRobot(VillageState.random(), randomRobot);
 // → Moved to Marketplace
