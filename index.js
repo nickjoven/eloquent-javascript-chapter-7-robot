@@ -254,15 +254,15 @@ class exampleVillageState {
                 // destinations? Not if you're being eloquent. If you're being eloquent, your robot
                 // decides that there is a new package to get, with an origin of Marketplace and an 
                 // address of p.address. Which means that--if I am dropping off a package at the Post
-                // Office--I am also going to pick up a package at the Marketplace from wherever each
+                // Office--I am also going to pick up a package at the Marketplace for wherever each
                 // package for the Post Office came from.
                 // That is COMPLETE nonsense--why would a delivery robot behave in this way??? The 
                 // code here is trying to do something absolutely insane!!!!!! HELP ME!!!!!!
                 // So, by virtue of not being included in the truthy outcome of the if statement, 
-                // we do not add the parcel to the new parcels list. It's being "dropped off" which
+                // we do not add the element p to the new parcels list. It's being "dropped off" which
                 // just means it's being "left off of" the new list.
-                // but we are also making a new package with origin Marketplace and destination
-                // p.address.
+                // But we are also making a new package with origin Marketplace and destination
+                // p.address. The text does NOT make mention of this aspect of the code.
                 return { place: Marketplace, address: p.address };
                 }
             // So what gets filtered here? Well, it's for this edge case. If we were delivering a
@@ -281,15 +281,116 @@ class exampleVillageState {
 
 // Wow, that is some horseshit. I'll push this to github IDGAF
 
-// See this line here?
+// See this line from the book?
 
 // Then it creates a new state with the destination as the robot’s new place.But it also needs to 
 // create a new set of parcels—parcels that the robot is carrying(that are at the robot’s current 
 // place) need to be moved along to the new place.And parcels that are addressed to the new place 
-// need to be delivered—that is, they need to be removed from the set of undelivered parcels.The call 
-// to map takes care of the moving, and the call to filter does the delivering.
+// need to be delivered—that is, they need to be removed from the set of undelivered parcels. The
+// call to map takes care of the moving, and the call to filter does the delivering.
+// -end transmission-
 
+// It describes the purpose of the filter in an extremely misleading way and makes no mention of the
+// else statement creating a new package based on the next destination and origin of the package that
+// is getting dropped off.
 
+// I wasted a significant amount of time trying to make sense of it.
 
+// Anyway, here is the rest of the code.
 
+let first = new VillageState(
+    "Post Office",
+    [{ place: "Post Office", address: "Alice's House" }]
+);
+let next = first.move("Alice's House");
 
+console.log(next.place);
+// → Alice's House
+console.log(next.parcels);
+// → []
+console.log(first.place);
+// → Post Office
+
+let object = Object.freeze({ value: 5 });
+object.value = 10;
+console.log(object.value);
+// → 5
+
+function runRobot(state, robot, memory) {
+    for (let turn = 0; ; turn++) {
+        if (state.parcels.length == 0) {
+            console.log(`Done in ${turn} turns`);
+            break;
+        }
+        let action = robot(state, memory);
+        state = state.move(action.direction);
+        memory = action.memory;
+        console.log(`Moved to ${action.direction}`);
+    }
+}
+
+function randomPick(array) {
+    let choice = Math.floor(Math.random() * array.length);
+    return array[choice];
+}
+
+function randomRobot(state) {
+    return { direction: randomPick(roadGraph[state.place]) };
+}
+
+VillageState.random = function (parcelCount = 5) {
+    let parcels = [];
+    for (let i = 0; i < parcelCount; i++) {
+        let address = randomPick(Object.keys(roadGraph));
+        let place;
+        do {
+            place = randomPick(Object.keys(roadGraph));
+        } while (place == address);
+        parcels.push({ place, address });
+    }
+    return new VillageState("Post Office", parcels);
+};
+
+// runRobot(VillageState.random(), randomRobot);
+
+const mailRoute = [
+    "Alice's House", "Cabin", "Alice's House", "Bob's House",
+    "Town Hall", "Daria's House", "Ernie's House",
+    "Grete's House", "Shop", "Grete's House", "Farm",
+    "Marketplace", "Post Office"
+];
+
+function routeRobot(state, memory) {
+    if (memory.length == 0) {
+        memory = mailRoute;
+    }
+    return { direction: memory[0], memory: memory.slice(1) };
+}
+
+function findRoute(graph, from, to) {
+    let work = [{ at: from, route: [] }];
+    for (let i = 0; i < work.length; i++) {
+        let { at, route } = work[i];
+        for (let place of graph[at]) {
+            if (place == to) return route.concat(place);
+            if (!work.some(w => w.at == place)) {
+                work.push({ at: place, route: route.concat(place) });
+            }
+        }
+    }
+}
+
+function goalOrientedRobot({ place, parcels }, route) {
+    if (route.length == 0) {
+        let parcel = parcels[0];
+        if (parcel.place != place) {
+            route = findRoute(roadGraph, place, parcel.place);
+        } else {
+            route = findRoute(roadGraph, place, parcel.address);
+        }
+    }
+    return { direction: route[0], memory: route.slice(1) };
+}
+
+runRobotAnimation(VillageState.random(),
+    goalOrientedRobot, []);
