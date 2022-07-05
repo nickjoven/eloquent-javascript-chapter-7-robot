@@ -298,23 +298,8 @@ class exampleVillageState {
 
 // Anyway, here is the rest of the code.
 
-let first = new VillageState(
-    "Post Office",
-    [{ place: "Post Office", address: "Alice's House" }]
-);
-let next = first.move("Alice's House");
-
-console.log(next.place);
-// → Alice's House
-console.log(next.parcels);
-// → []
-console.log(first.place);
-// → Post Office
-
-let object = Object.freeze({ value: 5 });
-object.value = 10;
-console.log(object.value);
-// → 5
+// next up are various functions for the robot to attempt. They will always use the .move operator
+// where they differ is how the robot chooses its destinations.
 
 function runRobot(state, robot, memory) {
     for (let turn = 0; ; turn++) {
@@ -338,6 +323,10 @@ function randomRobot(state) {
     return { direction: randomPick(roadGraph[state.place]) };
 }
 
+// we also need a way to randomize the location of parcels, which is done here
+// it creates a parcel list randomly and returns a new VillageState with the post office as the 
+// start and the random parcel list as the initial list of parcels to deliver.
+
 VillageState.random = function (parcelCount = 5) {
     let parcels = [];
     for (let i = 0; i < parcelCount; i++) {
@@ -353,6 +342,9 @@ VillageState.random = function (parcelCount = 5) {
 
 // runRobot(VillageState.random(), randomRobot);
 
+
+// this demonstration provides the robot with a fixed route like a mail truck
+
 const mailRoute = [
     "Alice's House", "Cabin", "Alice's House", "Bob's House",
     "Town Hall", "Daria's House", "Ernie's House",
@@ -366,6 +358,10 @@ function routeRobot(state, memory) {
     }
     return { direction: memory[0], memory: memory.slice(1) };
 }
+
+
+// And finally, we are shown code that explores for routes based on the parcels list
+// Honestly, it's probably more than I could cover in a weekend.
 
 function findRoute(graph, from, to) {
     let work = [{ at: from, route: [] }];
